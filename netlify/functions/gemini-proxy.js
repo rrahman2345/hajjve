@@ -24,7 +24,7 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
  * @returns {object} The response object.
  */
 
-exports.handler2 = async (event) => {
+exports.handler = async (event) => {
   return {
     statusCode: 200,
     body: JSON.stringify({ message: "Hello, world!" }),
