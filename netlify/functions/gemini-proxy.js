@@ -24,15 +24,14 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
  * @returns {object} The response object.
  */
 
-exports.handler = async (event, context) => {
+exports.handler2 = async (event) => {
   return {
     statusCode: 200,
     body: JSON.stringify({ message: "Hello, world!" }),
   };
-};
+    
 
-exports.handler2 = async (event) => {
-    // 1. Security Check: Only allow POST requests
+// 1. Security Check: Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
