@@ -25,11 +25,7 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
  */
 
 exports.handler = async (event) => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: "Hello, world!" }),
-  };
-    
+  
 
 // 1. Security Check: Only allow POST requests
     if (event.httpMethod !== 'POST') {
