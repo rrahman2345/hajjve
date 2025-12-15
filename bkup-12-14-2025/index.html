@@ -196,6 +196,93 @@
             font-weight: 600;
         }
 
+        /* --- AI Search Section Styles --- */
+        #ai-search .container {
+            max-width: 900px;
+        }
+
+        .search-form {
+            display: flex;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px var(--color-shadow);
+            border-radius: 50px;
+            overflow: hidden;
+            background-color: var(--color-white);
+        }
+
+        .search-form input[type="text"] {
+            flex-grow: 1;
+            padding: 1rem 1.5rem;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-form button {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            padding: 1rem 2rem;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-form button:hover {
+            background-color: var(--color-secondary);
+        }
+
+        /* Response Area */
+        #response-area {
+            text-align: left;
+            padding: 2rem;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            background-color: var(--color-white);
+            /* Fixed height for 5 lines plus padding (196px) */
+            height: 196px; 
+            overflow-y: auto; /* Enable vertical scrolling for content over 5 lines */
+            position: relative;
+        }
+
+        .loading-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Use full height of the response area */
+            height: 100%; 
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--color-primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .citation-container {
+            margin-top: 1.5rem;
+            border-top: 1px dashed #eee;
+            padding-top: 1rem;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .citation-container a {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: #555;
+            word-break: break-all;
+        }
+
         /* --- Call to Action Section (Dark) --- */
         .section-dark p {
             font-size: 1.2rem;
@@ -229,10 +316,12 @@
                     <h1>Path to Peace</h1>
                 </div>
                 <nav class="nav-links">
+                    <a href="#ai-search">AI Search</a>
                     <a href="#features">Solutions</a>
                     <a href="#journey">About</a>
                     <a href="#contact">Contact</a>
-                    <button class="header-login" onclick="alert('Login functionality goes here!')">Login / Register</button>
+                    <!-- Changed from alert() to console.log() as per best practice -->
+                    <button class="header-login" onclick="console.log('Login functionality triggered.')">Login / Register</button>
                 </nav>
             </div>
         </div>
@@ -243,9 +332,28 @@
             <div class="container">
                 <h2>Empowering the Global Ummah with Clarity and Ease</h2>
                 <p>We are a comprehensive digital ecosystem providing scholar-verified education, community support, and streamlined access to essential services for fulfilling the Five Pillars of Islam.</p>
-                <a href="#features" class="cta-button">Explore Our Solutions</a>
+                <a href="#ai-search" class="cta-button">Ask Our AI Guide</a>
             </div>
         </section>
+
+        <!-- New AI Search Section -->
+        <section id="ai-search" class="section section-dark">
+            <div class="container">
+                <h2>Ask Our AI Guide</h2>
+                <p>Use the power of AI and Google Search to find fast, grounded answers to your questions about faith, community, and services.</p>
+                
+                <form id="searchForm" class="search-form" onsubmit="handleSearch(event)">
+                    <input type="text" id="queryInput" placeholder="e.g., What are the steps for Wudu?" required>
+                    <button type="submit" id="searchButton">Search <i class="fas fa-search"></i></button>
+                </form>
+
+                <div id="response-area">
+                    <p>Your AI-powered answer will appear here, along with source citations from the web. (API calls are now routed through a secure backend proxy.)</p>
+                </div>
+            </div>
+        </section>
+        <!-- End AI Search Section -->
+
 
         <section id="features" class="section section-light">
             <div class="container">
@@ -288,5 +396,148 @@
         </div>
     </footer>
 
+    <script>
+        // *** IMPORTANT CHANGE: The client now calls a relative API endpoint for the proxy. ***
+        const PROXY_URL = `/api/gemini-proxy`; 
+	// const PROXY_URL = /.netlify/functions/gemini-proxy;
+        
+        // DOM Elements
+        const queryInput = document.getElementById('queryInput');
+        const searchButton = document.getElementById('searchButton');
+        const responseArea = document.getElementById('response-area');
+        const searchForm = document.getElementById('searchForm');
+
+        /**
+         * Generic sleep function for exponential backoff.
+         * @param {number} ms - Milliseconds to sleep.
+         */
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        /**
+         * Renders the loading spinner in the response area.
+         */
+        function showLoading() {
+            responseArea.innerHTML = `
+                <div class="loading-indicator">
+                    <div class="spinner"></div>
+                    <p style="margin-left: 1rem;">Searching the web...</p>
+                </div>
+            `;
+            searchButton.disabled = true;
+            queryInput.disabled = true;
+        }
+
+        /**
+         * Stops the loading indicator and enables the form.
+         */
+        function hideLoading() {
+            searchButton.disabled = false;
+            queryInput.disabled = false;
+        }
+
+        /**
+         * Calls the secure backend proxy with exponential backoff.
+         * @param {string} prompt The user's query.
+         */
+        async function fetchGroundedContent(prompt) {
+            // The client only sends the prompt to the backend proxy
+            const clientPayload = {
+                prompt: prompt
+            };
+            
+            const maxRetries = 5;
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    // Fetch call to the proxy endpoint
+                    const response = await fetch(PROXY_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(clientPayload)
+                    });
+
+                    // The proxy handles rate limits, so we check for generic errors here
+                    if (!response.ok) {
+                        const errorBody = await response.json().catch(() => ({ message: 'Unknown error from proxy.' }));
+                        throw new Error(`Proxy Request failed with status: ${response.status}. Message: ${errorBody.message}`);
+                    }
+
+                    // The proxy should return the structured Gemini response (text and sources)
+                    const result = await response.json();
+                    
+                    if (result && result.text) {
+                        // Success: return the response structure
+                        return { 
+                            text: result.text, 
+                            sources: result.sources || [] 
+                        };
+                    } else {
+                        return { text: "The proxy returned an empty or malformed response.", sources: [] };
+                    }
+
+                } catch (error) {
+                    console.error("API Proxy Error:", error);
+                    if (attempt < maxRetries - 1) {
+                        const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+                        await sleep(delay);
+                    } else {
+                        return { text: "A severe error occurred while contacting the search service. Please try again later.", sources: [] };
+                    }
+                }
+            }
+        }
+
+        /**
+         * Renders the AI response and citations.
+         * @param {string} text - The generated text.
+         * @param {Array<{uri: string, title: string}>} sources - The source citations.
+         */
+        function renderResponse(text, sources) {
+            // Note: The `text` should be converted from Markdown to HTML for display, 
+            // but for simplicity here, we'll just convert newlines to <br>.
+            let html = `<div>${text.replace(/\n/g, '<br>')}</div>`;
+
+            if (sources && sources.length > 0) {
+                // Deduplicate sources based on URI
+                const uniqueSources = Array.from(new Map(sources.map(item => [item.uri, item])).values());
+
+                let sourceHtml = `
+                    <div class="citation-container">
+                        <strong>Sources:</strong>
+                        ${uniqueSources.map((source, index) => `
+                            <a href="${source.uri}" target="_blank" title="${source.title}">
+                                ${index + 1}. ${source.title || source.uri}
+                            </a>
+                        `).join('')}
+                    </div>
+                `;
+                html += sourceHtml;
+            }
+
+            responseArea.innerHTML = html;
+        }
+
+        /**
+         * Main function to handle the search form submission.
+         * @param {Event} event - The form submission event.
+         */
+        async function handleSearch(event) {
+            event.preventDefault();
+            const query = queryInput.value.trim();
+
+            if (!query) return;
+
+            showLoading();
+            
+            try {
+                const { text, sources } = await fetchGroundedContent(query);
+                renderResponse(text, sources);
+            } catch (error) {
+                console.error("Search failed:", error);
+                responseArea.innerHTML = "<p style='color: red;'>Failed to fetch content. Please check the console for errors.</p>";
+            } finally {
+                hideLoading();
+            }
+        }
+    </script>
 </body>
 </html>
