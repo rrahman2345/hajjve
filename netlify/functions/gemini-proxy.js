@@ -24,9 +24,7 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
  * @returns {object} The response object.
  */
 
-exports.handler = async (event) => {
-  
-
+exports.handler = async (event) => {  
 // 1. Security Check: Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
