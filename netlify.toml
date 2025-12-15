@@ -1,7 +1,7 @@
 [build]
 functions = "netlify/functions" # Tells Netlify where your serverless functions are
 
-[redirects]
+[[redirects]]
 from = "/api/gemini-proxy"
 to = "/.netlify/functions/gemini-proxy"
 status = 200 # Important: Use status 200 for proxying
