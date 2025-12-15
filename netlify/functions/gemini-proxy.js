@@ -1,15 +1,8 @@
 // This function acts as a secure backend proxy to call the Gemini API,
 // hiding the GEMINI_API_KEY from the client-side code.
-//
-// HOW TO DEPLOY:
-// 1. Create a folder named 'netlify/functions' in your repository.
-// 2. Save this file inside that folder as 'gemini-proxy.js'.
-// 3. Set the environment variable GEMINI_API_KEY in your Netlify site settings.
-// 4. Client-side fetch requests should hit the endpoint: /.netlify/functions/gemini-proxy 
-//    (or simply /api/gemini-proxy if you set up Netlify redirects).
 
 const API_KEY = process.env.GEMINI_API_KEY;
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
 const MAX_RETRIES = 3;
 
 /**
@@ -23,9 +16,8 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
  * @param {object} event - The event object from Netlify.
  * @returns {object} The response object.
  */
-
-exports.handler = async (event) => {  
-// 1. Security Check: Only allow POST requests
+exports.handler = async (event) => {
+    // 1. Security Check: Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
@@ -33,12 +25,15 @@ exports.handler = async (event) => {
         };
     }
 
-    // 2. API Key Check
+    // 2. CRITICAL API Key Check - Updated to return a clearer status code/message
     if (!API_KEY) {
-        console.error("GEMINI_API_KEY environment variable is not set.");
+        console.error("CRITICAL ERROR: GEMINI_API_KEY environment variable is not set in Netlify settings.");
         return {
-            statusCode: 500,
-            body: JSON.stringify({ message: "Server configuration error. API Key missing." }),
+            // Using 503 Service Unavailable to indicate a server misconfiguration
+            statusCode: 503, 
+            body: JSON.stringify({ 
+                message: "Server configuration error: GEMINI_API_KEY is missing. Please set it in Netlify Environment Variables." 
+            }),
         };
     }
 
@@ -100,7 +95,9 @@ exports.handler = async (event) => {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`External API failed with status: ${response.status}. Body: ${errorText}`);
+                // If the response is not OK, log the error and break retries
+                console.error(`External API failed: Status ${response.status}. Response: ${errorText}`);
+                throw new Error(`External API failed with status: ${response.status}.`);
             }
 
             const result = await response.json();
@@ -134,11 +131,11 @@ exports.handler = async (event) => {
             }
 
         } catch (error) {
-            console.error("Gemini Proxy Execution Error:", error.message);
+            console.error(`Gemini Proxy Execution Error on attempt ${attempt + 1}:`, error.message);
             if (attempt === MAX_RETRIES - 1) {
                  return {
                     statusCode: 500,
-                    body: JSON.stringify({ message: `Internal server error after ${MAX_RETRIES} attempts.` }),
+                    body: JSON.stringify({ message: `Internal server error after ${MAX_RETRIES} attempts. Check Netlify function logs for details.` }),
                 };
             }
         }
