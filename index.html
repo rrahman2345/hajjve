@@ -13,7 +13,8 @@
             --color-primary: #00796B; /* Rich Teal/Green */
             --color-secondary: #004D40; /* Darker Green for accents/footer */
             --color-text: #333333;
-            --color-light-bg: #F8F9FA; /* Off-white for light sections */
+            --color-light-bg: #F8F9FA; */ /* Standard Green */
+ /* #F8F9FA; Off-white for light sections */
             --color-white: #ffffff;
             --color-shadow: rgba(0, 0, 0, 0.08);
             --border-radius: 8px;
@@ -21,10 +22,13 @@
 
         /* Base Styles */
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+            /* Set font size to 12pt (standard for documents) or 16px */
+            font-size: 16pt;
+	    background-image: url("green-bkg1.png");
             margin: 0;
             padding: 0;
-            background-color: var(--color-light-bg);
+	    background-color: var(--color-light-bg);
             color: var(--color-text);
             line-height: 1.65;
         }
@@ -75,7 +79,7 @@
         }
 
         .header-login {
-            background-color: var(--color-primary);
+            background-color: var(--color-light-bg);
             color: var(--color-white);
             padding: 0.5rem 1rem;
             border-radius: var(--border-radius);
@@ -86,14 +90,16 @@
         }
 
         .header-login:hover {
-            background-color: var(--color-secondary);
+            background-color: var(--color-light-bg);
+	    transform: translateY(-2px); /* Slight lift on hover */
+
         }
 
         /* --- Buttons/CTAs --- */
         .cta-button {
             display: inline-block;
-            background-color: var(--color-primary);
-            color: var(--color-white);
+            background-color: var(--color-light-bg);  /*--color-primary);*/
+	    color: var(--color-white);
             padding: 1rem 2rem;
             text-decoration: none;
             border-radius: 50px; /* Pill shape for a modern look */
@@ -108,13 +114,14 @@
         }
 
         .cta-button:hover {
-            background-color: var(--color-secondary);
+            background-color: var(--color-light-bg);
             transform: translateY(-2px); /* Slight lift on hover */
         }
 
         /* --- Hero Section --- */
         .hero {
-            background: linear-gradient(135deg, #E0F7FA 0%, #B2DFDB 100%); /* Subtle gradient background */
+            background-image: url("green-bkg1.png");
+	   /* background: linear-gradient(135deg, #E0F7FA 0%, #B2DFDB 100%);*/ /* Subtle gradient background */
             text-align: center;
             padding: 6rem 1.5rem;
         }
@@ -128,11 +135,15 @@
         }
 
         .hero p {
-            font-size: 1.3rem;
+           /* font-size: 1.3rem;*/
             max-width: 800px;
             margin: 1rem auto 2rem;
             color: #555;
             font-weight: 300;
+            font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+             /* Set font size to 12pt (standard for documents) or 16px */
+            font-size: 16pt;
+
         }
 
         /* --- General Sections --- */
@@ -162,6 +173,10 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             text-align: left;
+           font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+            /* Set font size to 12pt (standard for documents) or 16px */
+            font-size: 16pt;
+
         }
 
         .card {
@@ -172,6 +187,10 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             text-align: center;
             border-top: 5px solid var(--color-primary); /* Feature highlight */
+           font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+            /* Set font size to 12pt (standard for documents) or 16px */
+            font-size: 16pt;
+
         }
 
         .card:hover {
@@ -219,7 +238,7 @@
         }
 
         .search-form button {
-            background-color: var(--color-primary);
+            background-color: var(--color-llight-bg);
             color: var(--color-white);
             padding: 1rem 2rem;
             border: none;
@@ -230,7 +249,9 @@
         }
 
         .search-form button:hover {
-            background-color: var(--color-secondary);
+            background-color: var(--color-light-bg);
+	    transform: translateY(-2px); /* Slight lift on hover */
+
         }
 
         /* Response Area */
@@ -273,6 +294,10 @@
             padding-top: 1rem;
             font-size: 0.9rem;
             color: #777;
+           font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+            /* Set font size to 12pt (standard for documents) or 16px */
+            font-size: 16pt;
+
         }
 
         .citation-container a {
@@ -289,11 +314,15 @@
             max-width: 900px;
             margin: auto;
             color: #555;
+           font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+            /* Set font size to 12pt (standard for documents) or 16px */
+            font-size: 16pt;
+
         }
 
         /* --- Footer --- */
         footer {
-            background-color: var(--color-secondary);
+            background-color: var(--color-light-bg);
             color: var(--color-white);
             text-align: center;
             padding: 3rem 0;
@@ -304,6 +333,12 @@
             margin: 0.5rem 0;
             font-size: 0.9rem;
             opacity: 0.8;
+           font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+            /* Set font size to 12pt (standard for documents) or 16px */
+            font-size: 16pt;
+	   color: #555;
+
+
         }
     </style>
 </head>
@@ -335,7 +370,7 @@
             </div>
         </section>
 
-        <section id="ai-search" class="section section-dark">
+        <section id="ai-search" class="hero"> 
             <div class="container">
                 <h2>Ask Our AI Guide</h2>
                 <p>Use the power of AI and Google Search to find fast, grounded answers to your questions about faith, community, and services.</p>
@@ -373,12 +408,23 @@
                         <i class="fas fa-hands-holding-child"></i> <h3><a href="https://mytawil.com" target="_blank">Ummah (Community)</a></h3>
                         <p>Connect with a global network of Muslims. Find mentorship, share experiences, and facilitate charitable giving in a secure and supportive environment.</p>
                     </div>
+                    <div class="card">
+                        <i class="fas fa-hands-holding-child"></i> <h3><a href=https://musaffa.com/stock-screener?page=1&country=US target="_blank">Sharia compliant Stock Search</a></h3>
+                        <p>Find Sharia Compliant Stocks Screening</p>
+                    </div>
+
+                    <div class="card">
+                        <i class="fas fa-hands-holding-child"></i> <h3><a href="https://community.zoya.finance/" target="_blank">Community Forum on Sharia compliant Investment </a></h3>
+                        <p>Sharia Compliant Investment Forum</p>
+                    </div>
+
+
                     
                 </div>
             </div>
         </section>
 
-        <section id="journey" class="section section-dark">
+        <section id="journey" class="hero">
             <div class="container">
                 <h2>A Trusted Guide for Your Journey</h2>
                 <p>In an era of digital distraction and spiritual dilution, our mission is to empower Muslims worldwide by providing a single, intuitive platform to fulfill the Five Pillars of Islam with understanding and ease. **Join us in building a stronger global community.**</p>
