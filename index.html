@@ -539,8 +539,8 @@
         function renderResponse(text, sources) {
             // Note: The `text` should be converted from Markdown to HTML for display, 
             // but for simplicity here, we'll just convert newlines to <br>.
-            let html1 = ${text.replace(/\*\*(.*?)\*\*/g, "<bold>$1</bold>")};
-            let html = `<div>${html1.replace(/\n/g, '<br>')}</div>`;
+          //  let text1 = ${text.replace(/\*\*(.*?)\*\*/g, "<bold>$1</bold>")};
+            let html = `<div>${text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<bold>$1</bold>')}</div>`;
 
             if (sources && sources.length > 0) {
                 // Deduplicate sources based on URI
