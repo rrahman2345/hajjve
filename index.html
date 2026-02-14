@@ -465,7 +465,7 @@
             responseArea.innerHTML = `
                 <div class="loading-indicator">
                     <div class="spinner"></div>
-                    <p style="margin-left: 1rem;">Searching the web...</p>
+                    <p style="margin-left: 1rem;">Asking Gemini AI ...</p>
                 </div>
             `;
             searchButton.disabled = true;
@@ -556,6 +556,9 @@
                     </div>
                 `;
                 html += sourceHtml;
+                // replace **text** to <bold>text<bold>
+		html = html.replace(/\*\*(.*?)\*\*/g, "<bold>$1</bold>");
+
             }
 
             responseArea.innerHTML = html;
